@@ -1,32 +1,35 @@
 const express = require("express");
 const filtroLogin = require("../intermediarios/intermediariosAutenticacao");
+const validarRequisicao = require("../intermediarios/intermediariosUsuarios");
+
 const { login } = require("../controlador/controladorAutenticacao");
+const { buscarCategoria } = require("../controlador/controladorCategorias");
 
 const {
-  buscarCategoria,
-  buscarUsuarios,
   cadastrarUsuario,
   atualizarPerfilUsuarioLogado,
   obterPerfilUsuarioLogado,
 } = require("../controlador/controladorUsuarios");
 
+const usuarioSchema = require("../validacoes/usuario");
+const loginSchema = require("../validacoes/loginSchema");
+
 const router = express();
 
-router.get("/categorias", buscarCategoria);
+router.get("/categoria", buscarCategoria);
 
-router.get("/usuarios", buscarUsuarios);
+router.post("/usuario", validarRequisicao(usuarioSchema), cadastrarUsuario);
 
-router.post("/usuario", cadastrarUsuario);
-
-router.post("/login", login);
+router.post("/login", validarRequisicao(loginSchema), login);
 
 router.use(filtroLogin);
 
-router.get("/perfil", obterPerfilUsuarioLogado);
+router.get("/usuario", obterPerfilUsuarioLogado);
 
-router.put("/usuario", atualizarPerfilUsuarioLogado);
-
+router.put(
+  "/usuario",
+  validarRequisicao(usuarioSchema),
+  atualizarPerfilUsuarioLogado
+);
 
 module.exports = router;
-
-

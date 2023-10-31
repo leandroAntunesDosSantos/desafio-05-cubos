@@ -1,31 +1,9 @@
 const bcript = require("bcrypt");
 const knex = require("../database/databaseConexao");
 
-const buscarCategoria = async (req, res) => {
-  try {
-    const usuarios = await knex("categorias");
-    return res.json(usuarios);
-  } catch (error) {
-    return res.status(500).json(error.massage);
-  }
-};
-
-const buscarUsuarios = async (req, res) => {
-  try {
-    const usuarios = await knex("usuarios");
-    return res.json(usuarios);
-  } catch (error) {
-    return res.status(500).json(error.massage);
-  }
-};
-
 const cadastrarUsuario = async (req, res) => {
   const { nome, email, senha } = req.body;
-  if (!nome || !email || !senha) {
-    return res
-      .status(400)
-      .json({ mensagem: "Preencha todos os campos obrigatórios" });
-  }
+
   try {
     const usuarioEncontrado = await knex("usuarios").where({ email }).first();
     if (usuarioEncontrado) {
@@ -47,18 +25,16 @@ const cadastrarUsuario = async (req, res) => {
 };
 
 const obterPerfilUsuarioLogado = async (req, res) => {
-  return res.status(200).json(req.usuario);
+  try {
+    return res.status(200).json(req.usuario);
+  } catch (error) {
+    return res.status(500).json({ mensagem: "Erro interno do servidor" });
+  }
 };
 
 const atualizarPerfilUsuarioLogado = async (req, res) => {
   const { nome, email, senha } = req.body;
   const { id } = req.usuario;
-
-  if (!nome && !email && !senha) {
-    return res
-      .status(404)
-      .json("É obrigatório informar ao menos um campo para atualização");
-  }
 
   try {
     const usuarioExiste = await knex("usuarios").where({ id }).first();
@@ -91,8 +67,6 @@ const atualizarPerfilUsuarioLogado = async (req, res) => {
 };
 
 module.exports = {
-  buscarCategoria,
-  buscarUsuarios,
   cadastrarUsuario,
   obterPerfilUsuarioLogado,
   atualizarPerfilUsuarioLogado,
