@@ -1,6 +1,10 @@
 const bcript = require("bcrypt");
 const knex = require("../database/databaseConexao");
 
+const deployAplicacao = async (req, res) => {
+  res.status(200).json({ msg: "aplicacao rodando na cyclic" });
+};
+
 const cadastrarUsuario = async (req, res) => {
   const { nome, email, senha } = req.body;
 
@@ -67,6 +71,7 @@ const atualizarPerfilUsuarioLogado = async (req, res) => {
 };
 
 module.exports = {
+  deployAplicacao,
   cadastrarUsuario,
   obterPerfilUsuarioLogado,
   atualizarPerfilUsuarioLogado,

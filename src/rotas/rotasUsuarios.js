@@ -6,6 +6,7 @@ const { login } = require("../controlador/controladorAutenticacao");
 const { buscarCategoria } = require("../controlador/controladorCategorias");
 
 const {
+  deployAplicacao,
   cadastrarUsuario,
   atualizarPerfilUsuarioLogado,
   obterPerfilUsuarioLogado,
@@ -15,6 +16,8 @@ const usuarioSchema = require("../validacoes/usuario");
 const loginSchema = require("../validacoes/loginSchema");
 
 const router = express();
+
+router.get("/", deployAplicacao);
 
 router.get("/categoria", buscarCategoria);
 
