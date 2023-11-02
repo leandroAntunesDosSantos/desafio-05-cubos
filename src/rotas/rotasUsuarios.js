@@ -1,38 +1,22 @@
-const express = require("express");
+const rotasUsuarios = require("express").Router();
+
 const filtroLogin = require("../intermediarios/intermediariosAutenticacao");
 const validarRequisicao = require("../intermediarios/intermediariosUsuarios");
 
-const { login } = require("../controlador/controladorAutenticacao");
-const { buscarCategoria } = require("../controlador/controladorCategorias");
-
 const {
-  deployAplicacao,
   cadastrarUsuario,
-  atualizarPerfilUsuarioLogado,
-  obterPerfilUsuarioLogado,
+  obterPerfilUsuario,
+  atualizarUsuario,
 } = require("../controlador/controladorUsuarios");
 
-const usuarioSchema = require("../validacoes/usuario");
-const loginSchema = require("../validacoes/loginSchema");
+const usuarioSchema = require("../validacoes/usuarioSchema");
 
-const router = express();
+rotasUsuarios.post("/", validarRequisicao(usuarioSchema), cadastrarUsuario);
 
-router.get("/", deployAplicacao);
+rotasUsuarios.use(filtroLogin);
 
-router.get("/categoria", buscarCategoria);
+rotasUsuarios.get("/", obterPerfilUsuario);
 
-router.post("/usuario", validarRequisicao(usuarioSchema), cadastrarUsuario);
+rotasUsuarios.put("/", validarRequisicao(usuarioSchema), atualizarUsuario);
 
-router.post("/login", validarRequisicao(loginSchema), login);
-
-router.use(filtroLogin);
-
-router.get("/usuario", obterPerfilUsuarioLogado);
-
-router.put(
-  "/usuario",
-  validarRequisicao(usuarioSchema),
-  atualizarPerfilUsuarioLogado
-);
-
-module.exports = router;
+module.exports = rotasUsuarios;

@@ -1,8 +1,17 @@
-const rotasSwagger = require('./rotasSwagger')
+const rotasSwagger = require("./rotasSwagger");
 
-const rotas = require('express').Router()
+const rotasAutenticacao = require("./rotasAutenticacao");
 
+const rotasUsuarios = require("./rotasUsuarios");
+const rotasCategorias = require("./rotasCategorias");
+const rotasProdutos = require("./rotasProdutos");
 
-rotas.use("/doc", rotasSwagger)
+const rotas = require("express").Router();
 
-module.exports = rotas
+rotas.use("/usuario", rotasUsuarios);
+rotas.use("/login", rotasAutenticacao);
+rotas.use("/categoria", rotasCategorias);
+rotas.use("/produto", rotasProdutos);
+
+rotas.use("/doc", rotasSwagger);
+module.exports = rotas;
