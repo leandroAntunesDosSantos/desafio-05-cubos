@@ -8,7 +8,7 @@ create table usuarios (
 );
 
 create table categorias (
-	id serial primary key, 
+	id serial primary key not null, 
 	descricao text
 );
 
@@ -25,3 +25,24 @@ values
 ('Bebê'),
 ('Games');
 
+create table produtos (
+    id 
+    descricao text,
+    quantidade_estoque integer,
+    valor integer, 
+    categoria_id integer not null references categorias(id)
+);
+
+
+create table clientes (
+    id serial primary key not null,
+    nome text,
+    email text unique,
+    cpf text unique,
+    cep text,
+    rua text,
+    numero integer,
+    bairro text,
+    cidade text,
+    estado text
+);

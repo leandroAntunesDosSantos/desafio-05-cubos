@@ -1,9 +1,6 @@
 const bcript = require("bcrypt");
 const knex = require("../database/databaseConexao");
 
-const deployAplicacao = async (req, res) => {
-  return res.status(200).json({ msg: "aplicacao rodando na cyclic" });
-};
 
 const cadastrarUsuario = async (req, res) => {
   const { nome, email, senha } = req.body;
@@ -28,7 +25,7 @@ const cadastrarUsuario = async (req, res) => {
   }
 };
 
-const obterPerfilUsuarioLogado = async (req, res) => {
+const obterPerfilUsuario = async (req, res) => {
   try {
     return res.status(200).json(req.usuario);
   } catch (error) {
@@ -36,7 +33,7 @@ const obterPerfilUsuarioLogado = async (req, res) => {
   }
 };
 
-const atualizarPerfilUsuarioLogado = async (req, res) => {
+const atualizarUsuario = async (req, res) => {
   const { nome, email, senha } = req.body;
   const { id } = req.usuario;
 
@@ -71,8 +68,7 @@ const atualizarPerfilUsuarioLogado = async (req, res) => {
 };
 
 module.exports = {
-  deployAplicacao,
   cadastrarUsuario,
-  obterPerfilUsuarioLogado,
-  atualizarPerfilUsuarioLogado,
+  obterPerfilUsuario,
+  atualizarUsuario,
 };
