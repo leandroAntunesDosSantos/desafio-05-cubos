@@ -2,7 +2,7 @@ const bcript = require("bcrypt");
 const knex = require("../database/databaseConexao");
 
 const deployAplicacao = async (req, res) => {
-  res.status(200).json({ msg: "aplicacao rodando na cyclic" });
+  return res.status(200).json({ msg: "aplicacao rodando na cyclic" });
 };
 
 const cadastrarUsuario = async (req, res) => {
@@ -64,7 +64,7 @@ const atualizarPerfilUsuarioLogado = async (req, res) => {
       email,
       senha: senhaCriptografada,
     });
-    return res.status(204).send();
+    return res.status(204).json();
   } catch (error) {
     return res.status(500).json({ mensagem: "Erro interno do servidor" });
   }

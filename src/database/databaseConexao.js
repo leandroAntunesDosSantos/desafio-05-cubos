@@ -37,9 +37,21 @@ const knex = require("knex")({
         table.increments("id").primary();
         table.string("descricao", 255);
       });
+      console.log('Tabela "categorias" criada com sucesso');
+      await knex("categorias").insert([
+        { descricao: "Informática" },
+        { descricao: "Celulares" },
+        { descricao: "Beleza e Perfumaria" },
+        { descricao: "Mercado" },
+        { descricao: "Livros e Papelaria" },
+        { descricao: "Brinquedos" },
+        { descricao: "Moda" },
+        { descricao: "Bebê" },
+        { descricao: "Games" },
+      ]);
     }
   } catch (error) {
-    console.log("Erro ao conectar ao criar tabela banco de dados:", erro);
+    console.log("Erro ao conectar ao criar tabela banco de dados:", error);
   }
 })();
 
