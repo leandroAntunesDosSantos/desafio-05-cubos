@@ -3,28 +3,13 @@ const knex = require("../database/databaseConexao");
 const cadastrarProdutos = async (req, res) => {
   const { descricao, quantidade_estoque, valor, categoria_id } = req.body;
 
-  if (!descricao || !quantidade_estoque || !valor || !categoria_id) {
-    return res.status(404).json({
-      msg: "necessario informar todos os dados",
-    });
-  }
-  if (quantidade_estoque <= 0) {
-    return res.status(404).json({
-      msg: "Quantidade para adicionar inválida",
-    });
-  }
-  if (valor <= 0) {
-    return res.status(404).json({
-      msg: "valor de produto inválido",
-    });
-  }
   try {
     const buscarCategoria = await knex("categorias")
       .where("id", categoria_id)
       .first();
     if (!buscarCategoria) {
       return res.status(404).json({
-        msg: "Essa categoria não existe",
+        msg: "Essa categoria não foi encontrada",
       });
     }
     const cadastrarProduto = await knex("produtos")
@@ -46,23 +31,15 @@ const editarProdutos = async (req, res) => {
   const { id } = req.params;
   const { descricao, quantidade_estoque, valor, categoria_id } = req.body;
 
-  if (!descricao || !quantidade_estoque || !valor || !categoria_id) {
-    return res.status(404).json({
-      msg: "necessario informar todos os dados",
-    });
-  }
-  if (quantidade_estoque <= 0) {
-    return res.status(404).json({
-      msg: "Quantidade para adicionar inválida",
-    });
-  }
-  if (valor <= 0) {
-    return res.status(404).json({
-      msg: "valor de produto inválido",
-    });
-  }
-
   try {
+    const buscarCategoria = await knex("categorias")
+      .where("id", categoria_id)
+      .first();
+    if (!buscarCategoria) {
+      return res.status(404).json({
+        msg: "Essa categoria não foi encontrada",
+      });
+    }
     const buscarProduto = await knex("produtos").where({ id }).first();
     if (!buscarProduto) {
       return res.status(404).json({
@@ -84,7 +61,53 @@ const editarProdutos = async (req, res) => {
   }
 };
 
+const listarProdutos = async (req, res) => {
+  const { categoria_id } = req.query;
+  try {
+    if (categoria_id) {
+      const filtroProdutosID = await knex("produtos").where(
+        "categoria_id",
+        categoria_id
+      );
+      return res.status(200).json(filtroProdutosID);
+    }
+    const todosProdutos = await knex("produtos");
+    return res.status(200).json(todosProdutos);
+  } catch (error) {
+    return res.status(500).json({ mensagem: "Erro interno do servidor" });
+  }
+};
+
+const detalharProduto = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const buscarProduto = await knex("produtos").where({ id }).first();
+    if (!buscarProduto) {
+      return res.status(400).json({ mensagem: "Produto não encontrado" });
+    }
+    return res.status(200).json(buscarProduto);
+  } catch (error) {
+    return res.status(500).json({ mensagem: "Erro interno do servidor" });
+  }
+};
+
+const excluirProduto = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const buscarProduto = await knex("produtos").where({ id }).first();
+    if (!buscarProduto) {
+      return res.status(400).json({ mensagem: "Produto não encontrado" });
+    }
+    await knex("produtos").where({ id }).delete();
+    return res.status(204).json();
+  } catch (error) {
+    return res.status(500).json({ mensagem: "Erro interno do servidor" });
+  }
+};
 module.exports = {
   cadastrarProdutos,
   editarProdutos,
+  listarProdutos,
+  detalharProduto,
+  excluirProduto,
 };
