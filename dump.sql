@@ -26,7 +26,7 @@ values
 ('Games');
 
 create table produtos (
-    id 
+    id serial primary key not null,
     descricao text,
     quantidade_estoque integer,
     valor integer, 
