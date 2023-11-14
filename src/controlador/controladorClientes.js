@@ -1,7 +1,7 @@
 const knex = require("../database/databaseConexao");
 
 const cadastrarClientes = async (req, res) => {
-  const { nome, email, cpf } = req.body;
+  const { nome, email, cpf, cep, rua, numero, bairro, cidade, estado } = req.body;
   try {
     const buscarEmail = await knex("clientes").where({ email }).first();
     if (buscarEmail) {
@@ -20,8 +20,14 @@ const cadastrarClientes = async (req, res) => {
         nome,
         email,
         cpf,
+        cep,
+        rua,
+        numero,
+        bairro,
+        cidade,
+        estado
       })
-      .returning(["nome", "email", "cpf"]);
+      .returning(["nome", "email", "cpf","cep","rua","numero","bairro","cidade","estado"]);
     return res.status(201).json(cadastroDoCliente[0]);
   } catch (error) {
     return res.status(500).json({ mensagem: "Erro interno do servidor" });
@@ -30,7 +36,7 @@ const cadastrarClientes = async (req, res) => {
 
 const editarCliente = async (req, res) => {
   const { id } = req.params;
-  const { nome, email, cpf } = req.body;
+  const { nome, email, cpf, cep, rua, numero, bairro, cidade, estado } = req.body;
   try {
     const buscarCliente = await knex("clientes").where({ id }).first();
     if (!buscarCliente) {
@@ -38,17 +44,25 @@ const editarCliente = async (req, res) => {
         mensagem: "Cliente não encontrado",
       });
     }
+  
     const buscarEmail = await knex("clientes").where({ email }).first();
+    
     if (buscarEmail) {
-      return res.status(400).json({
-        mensagem: "Email ja esta cadastrado",
-      });
+      if(buscarEmail.email !== buscarCliente.email){
+        return res.status(400).json({
+          mensagem: "Email ja esta cadastrado",
+        });
+      }
     }
+    
     const buscarCpf = await knex("clientes").where({ cpf }).first();
+
     if (buscarCpf) {
-      return res.status(400).json({
-        mensagem: "Este cpf ja esta cadastrado",
-      });
+      if(buscarCpf.cpf !== buscarCliente.cpf){
+        return res.status(400).json({
+          mensagem: "Este cpf ja esta cadastrado",
+        });
+      } 
     }
     const alteracaoCadastro = await knex("clientes")
       .where({ id })
@@ -56,10 +70,17 @@ const editarCliente = async (req, res) => {
         nome,
         email,
         cpf,
+        cep,
+        rua,
+        numero,
+        bairro,
+        cidade,
+        estado
       })
-      .returning(["nome", "email", "cpf"]);
+      .returning(["nome", "email", "cpf","cep","rua","numero","bairro","cidade","estado"]);
     return res.status(201).json(alteracaoCadastro[0]);
   } catch (error) {
+    console.log(error)
     return res.status(500).json({ mensagem: "Erro interno do servidor" });
   }
 };
