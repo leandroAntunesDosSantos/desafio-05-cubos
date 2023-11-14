@@ -46,3 +46,5 @@ create table clientes (
     cidade text,
     estado text
 );
+
+commitando de teste
