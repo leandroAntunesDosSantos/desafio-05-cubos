@@ -30,7 +30,7 @@ create table produtos (
     descricao text,
     quantidade_estoque integer,
     valor integer, 
-    categoria_id integer not null references categorias(id)
+    categoria_id integer not null references categorias(id),
 );
 
 
@@ -47,4 +47,24 @@ create table clientes (
     estado text
 );
 
-commitando de teste
+create table pedidos (
+    id serial primary key not null,
+    client_id integer not null references clientes(id),
+    observacao text,
+    valor_total integer
+)
+
+create table pedido_produtos (
+    id serial primary key not null,
+    pedido_id integer not null references pedidos(id),
+    produto_id integer not null references produtos(id),
+    quantidade_produto integer,
+    valor_produto integer
+)
+
+
+ALTER TABLE produtos 
+ADD COLUMN 
+produto_imagem text;
+
+

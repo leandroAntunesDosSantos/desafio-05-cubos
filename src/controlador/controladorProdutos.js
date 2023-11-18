@@ -20,7 +20,7 @@ const cadastrarProdutos = async (req, res) => {
         categoria_id,
       })
       .returning(["descricao", "quantidade_estoque", "valor", "categoria_id"]);
-    return res.status(200).json(cadastrarProduto[0]);
+    return res.status(200).json();
   } catch (error) {
     console.log(error);
     return res.status(500).json({ mensagem: "Erro interno do servidor" });

@@ -5,6 +5,7 @@ const rotasAutenticacao = require("./rotasAutenticacao");
 const rotasCategorias = require("./rotasCategorias");
 const rotasProdutos = require("./rotasProdutos");
 const rotasClientes = require("./rotasClientes");
+const rotasPedidos = require("./rotasPedidos");
 
 const rotas = require("express").Router();
 
@@ -13,6 +14,8 @@ rotas.use("/login", rotasAutenticacao);
 rotas.use("/categoria", rotasCategorias);
 rotas.use("/produto", rotasProdutos);
 rotas.use("/cliente", rotasClientes);
+rotas.use("/pedido", rotasPedidos);
+
 
 rotas.use("/doc", rotasSwagger);
 module.exports = rotas;
