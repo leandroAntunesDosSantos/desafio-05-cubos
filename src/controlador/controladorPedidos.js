@@ -23,11 +23,28 @@ const cadastrarPedido = async (req,res)=>{
           }
         }
 
-        let valorTotalAPagar = 0
+        let valorTotalAPagar = 0;
 
-        let totalDeItens = 0
+        for (let i = 0; i < pedido_produtos.length; i++) {
+          const idProdutoCompra = pedido_produtos[i].produto_id
 
+          const quantidadeProdutoCompra = pedido_produtos[i].quantidade_produto
 
+          let buscarProduto = await knex('produtos').where('id', idProdutoCompra).first()
+
+          let valorPorProduto = quantidadeProdutoCompra * buscarProduto.valor
+
+          valorTotalAPagar += valorPorProduto
+
+          totalDeItens = quantidadeProdutoCompra
+          
+        }
+
+        const tabelaPedidos = await knex('pedidos').insert({
+          client_id: cliente_id, 
+          observacao,
+          valor_total: valorTotalAPagar
+         }).returning(["id","client_id","observacao","valor_total"])
 
         for (let i = 0; i < pedido_produtos.length; i++) {
           const idProdutoCompra = pedido_produtos[i].produto_id
@@ -36,18 +53,11 @@ const cadastrarPedido = async (req,res)=>{
           let buscarProduto = await knex('produtos').where('id', idProdutoCompra).first()
 
           let estoqueFinal = buscarProduto.quantidade_estoque - quantidadeProdutoCompra
-          
-          valorTotalAPagar += quantidadeProdutoCompra * buscarProduto.valor
+
+          let valorPorProduto = quantidadeProdutoCompra * buscarProduto.valor
 
           totalDeItens = quantidadeProdutoCompra
-
-          const tabelaPedidos = await knex('pedidos').insert({
-            client_id: cliente_id, 
-            observacao,
-            valor_total: valorTotalAPagar
-           }).returning(["id","client_id","observacao","valor_total"])
-          
-
+   
           const tabelaProdutos = await knex('produtos')
           .where('id', idProdutoCompra)
           .update({
@@ -58,13 +68,9 @@ const cadastrarPedido = async (req,res)=>{
             pedido_id: tabelaPedidos[0].id,
             produto_id: tabelaProdutos[0].id,
             quantidade_produto: totalDeItens,
-            valor_produto: valorTotalAPagar
-           })
-           
+            valor_produto: valorPorProduto
+           })     
         }
-        
-
-
          return res.status(201).json({msg: "Produto cadastrado"})
     } catch (error) {
         console.log(error)
@@ -82,31 +88,28 @@ const listarPedidos = async (req,res)=>{
         return res.status(200).json(listarTodosPedidos)
       }
       
-      const pedidos = await knex('pedidos').where('client_id', cliente_id);
+      const listarTodosPedidos = await knex('pedidos') 
+      
+      const filtrarPedidos = listarTodosPedidos.filter((item)=>{
+        return item.client_id === Number(cliente_id)
+      })
 
+      const arrayPedidos = []
 
-      const historicoCompras = []
+      for (let i = 0; i < filtrarPedidos.length; i++) {
+        const pedido = filtrarPedidos[i]
+        const filtroId = filtrarPedidos[i].id
 
-      for (let i = 0; i < pedidos.length; i++) {
-        const pedido = pedidos[i]
-        const valorPedido = pedidos[i].id
-        const pedido_produtos = await knex('pedido_produtos').where("pedido_id", valorPedido);
-
-        const extrato = [{pedido,},[pedido_produtos,]];
-
-        historicoCompras.push(extrato)  
-       
+        const pedido_produtos = await knex('pedido_produtos').where('pedido_id', filtroId)
+        const extrato = [{pedido,pedido_produtos,}];
+        arrayPedidos.push(extrato)
       }
 
-      return res.status(200).json(historicoCompras)
-
-
+      return res.status(200).json(arrayPedidos)
     } catch (error) {
-    
       return res.status(500).json({ mensagem: "Erro interno do servidor" });
     }
 }
-
 
 module.exports = {
     cadastrarPedido,
