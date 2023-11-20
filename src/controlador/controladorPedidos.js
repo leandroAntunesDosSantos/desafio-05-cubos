@@ -9,6 +9,8 @@ const cadastrarPedido = async (req,res)=>{
             return res.status(400).json({ mensagem: "Cliente não encontrado" });
         }
 
+        let valorTotalAPagar = 0;
+
         for (let i = 0; i < pedido_produtos.length; i++) {
           let idProduto = pedido_produtos[i].produto_id
           let quantidadeProduto = pedido_produtos[i].quantidade_produto
@@ -21,59 +23,44 @@ const cadastrarPedido = async (req,res)=>{
           if(quantidadeProduto > verificarExisteProduto.quantidade_estoque){
             return res.status(400).json({ mensagem: "Estoque insuficiente para o produto de Id: " + idProduto });
           }
-        }
 
-        let valorTotalAPagar = 0;
-
-        for (let i = 0; i < pedido_produtos.length; i++) {
-          const idProdutoCompra = pedido_produtos[i].produto_id
-
-          const quantidadeProdutoCompra = pedido_produtos[i].quantidade_produto
-
-          let buscarProduto = await knex('produtos').where('id', idProdutoCompra).first()
-
-          let valorPorProduto = quantidadeProdutoCompra * buscarProduto.valor
+          const valorPorProduto = quantidadeProduto * verificarExisteProduto.valor
 
           valorTotalAPagar += valorPorProduto
 
-          totalDeItens = quantidadeProdutoCompra
-          
         }
 
         const tabelaPedidos = await knex('pedidos').insert({
           client_id: cliente_id, 
           observacao,
           valor_total: valorTotalAPagar
-         }).returning(["id","client_id","observacao","valor_total"])
+         }).returning(["id"])
 
         for (let i = 0; i < pedido_produtos.length; i++) {
           const idProdutoCompra = pedido_produtos[i].produto_id
           const quantidadeProdutoCompra = pedido_produtos[i].quantidade_produto
 
-          let buscarProduto = await knex('produtos').where('id', idProdutoCompra).first()
+          const buscarProduto = await knex('produtos').where('id', idProdutoCompra).first()
 
-          let estoqueFinal = buscarProduto.quantidade_estoque - quantidadeProdutoCompra
+          const estoqueFinal = buscarProduto.quantidade_estoque - quantidadeProdutoCompra
 
-          let valorPorProduto = quantidadeProdutoCompra * buscarProduto.valor
-
-          totalDeItens = quantidadeProdutoCompra
+          const valorPorProduto = quantidadeProdutoCompra * buscarProduto.valor
    
           const tabelaProdutos = await knex('produtos')
           .where('id', idProdutoCompra)
           .update({
             quantidade_estoque: estoqueFinal
-          }).returning(["id","descricao"])
+          }).returning(["id"])
 
-          const pedidoProduto = await knex('pedido_produtos').insert({
+          await knex('pedido_produtos').insert({
             pedido_id: tabelaPedidos[0].id,
             produto_id: tabelaProdutos[0].id,
-            quantidade_produto: totalDeItens,
+            quantidade_produto: quantidadeProdutoCompra,
             valor_produto: valorPorProduto
            })     
         }
          return res.status(201).json({msg: "Produto cadastrado"})
     } catch (error) {
-        console.log(error)
         return res.status(500).json({ mensagem: "Erro interno do servidor" });
     }
 }
