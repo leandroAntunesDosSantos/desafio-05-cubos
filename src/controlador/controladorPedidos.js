@@ -11,6 +11,7 @@ const cadastrarPedido = async (req,res)=>{
         }
 
         const buscarCliente = await knex('clientes').where('id', cliente_id).first();
+
         if(!buscarCliente){
             return res.status(400).json({ mensagem: "Cliente não encontrado!" });
         }
@@ -18,10 +19,10 @@ const cadastrarPedido = async (req,res)=>{
         let valorTotalAPagar = 0;
 
         for (let i = 0; i < pedido_produtos.length; i++) {
-          let idProduto = pedido_produtos[i].produto_id
-          let quantidadeProduto = pedido_produtos[i].quantidade_produto
+          const idProduto = pedido_produtos[i].produto_id
+          const quantidadeProduto = pedido_produtos[i].quantidade_produto
 
-          let verificarExisteProduto = await knex('produtos').where('id', idProduto).first();
+          const verificarExisteProduto = await knex('produtos').where('id', idProduto).first();
         
           if(!verificarExisteProduto){
             return res.status(400).json({ mensagem: "Produto de Id: " + idProduto + " não encontrado" });
