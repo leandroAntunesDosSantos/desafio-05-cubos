@@ -8,14 +8,14 @@ const rotasPedidos = require("express").Router();
 const { cadastrarPedido, listarPedidos } = require("../controlador/controladorPedidos");
 
 
-// const validarRequisicao = require("../intermediarios/intermediariosUsuarios");
+const validarRequisicao = require("../intermediarios/intermediariosUsuarios");
 
-// const pedidoSchema = require("../validacoes/pedidoSchema");
+const pedidoSchema = require("../validacoes/pedidoSchema");
 
 
 rotasPedidos.use(filtroLogin);
 
-rotasPedidos.post('/', cadastrarPedido)
+rotasPedidos.post('/',validarRequisicao(pedidoSchema), cadastrarPedido)
 rotasPedidos.get('/', listarPedidos)
 
 module.exports = rotasPedidos
